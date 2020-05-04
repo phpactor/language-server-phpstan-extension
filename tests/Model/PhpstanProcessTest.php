@@ -8,8 +8,9 @@ use LanguageServerProtocol\Position;
 use LanguageServerProtocol\Range;
 use PHPUnit\Framework\TestCase;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
+use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 
-class LinterTest extends IntegrationTestCase
+class PhpstanProcessTest extends IntegrationTestCase
 {
     /**
      * @dataProvider provideLint
@@ -18,8 +19,8 @@ class LinterTest extends IntegrationTestCase
     {
         $this->workspace()->reset();
         $this->workspace()->put('test.php', $source);
-        $linter = new Linter();
-        $diagnostics = \Amp\Promise\wait($linter->lint($this->workspace()->path('test.php')));
+        $linter = new PhpstanProcess();
+        $diagnostics = \Amp\Promise\wait($linter->analyse($this->workspace()->path('test.php')));
         self::assertEquals($expectedDiagnostics, $diagnostics);
     }
 
