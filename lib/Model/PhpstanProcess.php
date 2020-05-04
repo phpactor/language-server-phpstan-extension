@@ -14,13 +14,19 @@ class PhpstanProcess
      */
     private $phpstanPath;
 
-    public function __construct()
+    /**
+     * @var DiagnosticsParser
+     */
+    private $parser;
+
+    public function __construct(DiagnosticsParser $parser = null)
     {
         $this->phpstanPath = __DIR__ . '/../../vendor/bin/phpstan';
+        $this->parser = $parser ?: new DiagnosticsParser();
     }
 
     /**
-     * @return Promise<array<Diagnostic>>
+     * @return Promise<array>
      */
     public function analyse(string $filename): Promise
     {
@@ -46,7 +52,7 @@ class PhpstanProcess
                 ));
             }
 
-            die($diagnostics);
+            return $this->parser->parse($stdout);
         });
     }
 }

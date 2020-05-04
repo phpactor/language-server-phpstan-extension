@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 
+use Amp\Promise;
 use LanguageServerProtocol\Diagnostic;
 
 class Linter
@@ -17,10 +18,10 @@ class Linter
     }
 
     /**
-     * @return array<Diagnostic>
+     * @return Promise<array<Diagnostic>>
      */
-    public function lint(string $string): array
+    public function lint(string $string): Promise
     {
-        return [];
+        return $this->process->analyse($string);
     }
 }
