@@ -14,6 +14,8 @@ class DiagnosticsParser
      */
     public function parse(string $jsonString): array
     {
+        fwrite(STDOUT, $jsonString."\n");
+
         $decoded = $this->decodeJson($jsonString);
         $diagnostics = [];
 
@@ -21,7 +23,7 @@ class DiagnosticsParser
             foreach ($fileDiagnostics['messages'] as $message) {
                 $diagnostics[] = new Diagnostic(
                     $message['message'],
-                    new Range(new Position($message['line'], 1), new Position($message['line'], 1)),
+                    new Range(new Position($message['line'] - 1, 1), new Position($message['line'] - 1, 100)),
                     null,
                     DiagnosticSeverity::ERROR,
                     'phpstan'

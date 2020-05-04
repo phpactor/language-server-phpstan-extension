@@ -7,6 +7,7 @@ use Monolog\Handler\StreamHandler;
 use Phpactor\Container\PhpactorContainer;
 use Phpactor\Extension\Console\ConsoleExtension;
 use Phpactor\Extension\LanguageServerPhpstan\Handler\DiagnosticsHandler;
+use Phpactor\Extension\LanguageServerPhpstan\LanguageServerPhpstanExtension;
 use Phpactor\Extension\LanguageServer\LanguageServerExtension;
 use Phpactor\Extension\Logger\Formatter\PrettyFormatter;
 use Phpactor\Extension\Logger\LoggingExtension;
@@ -17,7 +18,8 @@ $container = PhpactorContainer::fromExtensions([
     ConsoleExtension::class,
     LanguageServerExtension::class,
     LoggingExtension::class,
-    DiagnosticsHandler::class,
+    LanguageServerPhpstanExtension::class,
+    FilePathResolverExtension::class,
 ], [
     LoggingExtension::PARAM_FORMATTER => 'pretty',
 ]);

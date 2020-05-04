@@ -4,6 +4,7 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 
 use Amp\Promise;
 use LanguageServerProtocol\Diagnostic;
+use LanguageServerProtocol\VersionedTextDocumentIdentifier;
 
 class Linter
 {
@@ -12,16 +13,20 @@ class Linter
      */
     private $process;
 
-    public function __construct(PhpstanProcess $process = null)
+    public function __construct(?PhpstanProcess $process = null)
     {
         $this->process = $process ?: new PhpstanProcess();
     }
 
-    /**
-     * @return Promise<array<Diagnostic>>
-     */
-    public function lint(string $string): Promise
+    public function lint(string $url, string $text): Promise
     {
-        return $this->process->analyse($string);
+        return \Amp\call(function () use ($url, $text) {
+            $name = tempnam(sys_get_temp_dir(), 'phpstanls');
+            file_put_contents($name, $text);
+            $diagnostics = yield $this->process->analyse($name);
+            unlink($name);
+
+            return $diagnostics;
+        });
     }
 }
