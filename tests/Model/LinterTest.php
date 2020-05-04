@@ -14,10 +14,12 @@ class LinterTest extends IntegrationTestCase
     /**
      * @dataProvider provideLint
      */
-    public function testLint(string $source, array $expectedDiagnostics)
+    public function testLint(string $source, array $expectedDiagnostics): void
     {
+        $this->workspace()->reset();
+        $this->workspace()->put('test.php', $source);
         $linter = new Linter();
-        $diagnostics = \Amp\Promise\wait($linter->lint('test.php'));
+        $diagnostics = \Amp\Promise\wait($linter->lint($this->workspace()->path('test.php')));
         self::assertEquals($expectedDiagnostics, $diagnostics);
     }
 
@@ -31,7 +33,10 @@ class LinterTest extends IntegrationTestCase
         yield [
             '<?php $foobar = $barfoo;',
             [
-                new Diagnostic('Foobar', new Range(new Position(1, 2)), null, DiagnosticSeverity::ERROR, 'phpstan'),
+                new Diagnostic('Undefined variable: $barfoo', new Range(
+                    new Position(1, 1),
+                    new Position(1, 1)
+                ), null, DiagnosticSeverity::ERROR, 'phpstan'),
             ]
         ];
     }
