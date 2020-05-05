@@ -40,5 +40,12 @@
         "branch-alias": {
             "dev-master": "0.1.x-dev"
         }
+    },
+    "scripts": {
+        "integrate": [
+            "./vendor/bin/phpunit",
+            "./vendor/bin/phpstan analyze",
+            "./vendor/bin/php-cs-fixer fix"
+        ]
     }
 }
