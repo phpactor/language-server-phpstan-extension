@@ -39,7 +39,7 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
     /**
      * @var bool
      */
-    private $linting;
+    private $linting = false;
 
     /**
      * @var ?FileToLint
@@ -84,6 +84,8 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
                     return;
                 }
 
+                // if another update came in while doing the previous lint use
+                // use that.
                 if ($this->next) {
                     $fileToLint = $this->next;
                     $this->next = null;
@@ -91,8 +93,10 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
                     $fileToLint = yield $this->deferred->promise();
                 }
 
-                // reset deferred
                 $this->deferred = new Deferred();
+
+                // after we have reset deferred, we can safely set linting to
+                // `false` and let another resolve happen
                 $this->linting = false;
 
                 assert($fileToLint instanceof FileToLint);
@@ -132,11 +136,14 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
             $textDocument->identifier()->version
         );
 
+        // if we are already linting then store whatever comes afterwards in
+        // next, overwriting the redundant update
         if ($this->linting === true) {
             $this->next = $fileToLint;
             return;
         }
 
+        // resolving the promise will start PHPStan
         $this->linting = true;
         $this->deferred->resolve($fileToLint);
     }

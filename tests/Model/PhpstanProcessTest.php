@@ -19,7 +19,7 @@ class PhpstanProcessTest extends IntegrationTestCase
     {
         $this->workspace()->reset();
         $this->workspace()->put('test.php', $source);
-        $linter = new PhpstanProcess($this->workspace()->path(), new NullLogger());
+        $linter = new PhpstanProcess($this->workspace()->path(), __DIR__ . '/../../vendor/bin/phpstan', new NullLogger());
         $diagnostics = \Amp\Promise\wait($linter->analyse($this->workspace()->path('test.php')));
         self::assertEquals($expectedDiagnostics, $diagnostics);
     }

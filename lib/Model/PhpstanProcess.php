@@ -12,11 +12,6 @@ use Psr\Log\LoggerInterface;
 class PhpstanProcess
 {
     /**
-     * @var string
-     */
-    private $phpstanPath;
-
-    /**
      * @var DiagnosticsParser
      */
     private $parser;
@@ -31,12 +26,17 @@ class PhpstanProcess
      */
     private $logger;
 
-    public function __construct(string $cwd, LoggerInterface $logger, DiagnosticsParser $parser = null)
+    /**
+     * @var string
+     */
+    private $phpstanBin;
+
+    public function __construct(string $cwd, string $phpstanBin, LoggerInterface $logger, DiagnosticsParser $parser = null)
     {
-        $this->phpstanPath = __DIR__ . '/../../vendor/bin/phpstan';
         $this->parser = $parser ?: new DiagnosticsParser();
         $this->cwd = $cwd;
         $this->logger = $logger;
+        $this->phpstanBin = $phpstanBin;
     }
 
     /**
@@ -46,7 +46,7 @@ class PhpstanProcess
     {
         return \Amp\call(function () use ($filename) {
             $process = new Process([
-                $this->phpstanPath,
+                $this->phpstanBin,
                 'analyse',
                 '--no-progress',
                 '--error-format=json',
