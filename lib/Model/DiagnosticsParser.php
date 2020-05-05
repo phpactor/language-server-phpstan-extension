@@ -6,6 +6,7 @@ use LanguageServerProtocol\Diagnostic;
 use LanguageServerProtocol\DiagnosticSeverity;
 use LanguageServerProtocol\Position;
 use LanguageServerProtocol\Range;
+use RuntimeException;
 
 class DiagnosticsParser
 {
@@ -40,6 +41,15 @@ class DiagnosticsParser
      */
     private function decodeJson(string $jsonString): array
     {
-        return json_decode($jsonString, true, JSON_THROW_ON_ERROR);
+        $decoded = json_decode($jsonString, true);
+
+        if (null === $decoded) {
+            throw new RuntimeException(sprintf(
+                'Could not decode expected PHPStan JSON string "%s"',
+                $jsonString
+            ));
+        }
+
+        return $decoded;
     }
 }

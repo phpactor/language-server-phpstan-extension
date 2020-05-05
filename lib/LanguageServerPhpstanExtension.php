@@ -37,6 +37,7 @@ class LanguageServerPhpstanExtension implements Extension
 
             return new PhpstanProcess(
                 $root,
+                $root . '/vendor/bin/phpunit',
                 $container->get(LoggingExtension::SERVICE_LOGGER)
             );
         });
