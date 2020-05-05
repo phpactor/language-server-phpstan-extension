@@ -13,7 +13,7 @@ Usage
 
 ### Phpactor Extension
 
-If you are using the Phpactor Language Server
+If you are using the [Phpactor Language Server](https://phpactor.readthedocs.io/en/master/usage/language-server.html)
 
 ```
 $ phpactor extension:install "phpactor/language-server-phpstan-extension"
