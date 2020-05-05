@@ -5,6 +5,7 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 use Amp\Process\Process;
 use Amp\Promise;
 use function Amp\ByteStream\buffer;
+use LanguageServerProtocol\Diagnostic;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Excepteion\PhpstanProcessError;
 use Psr\Log\LoggerInterface;
 
@@ -39,7 +40,7 @@ class PhpstanProcess
     }
 
     /**
-     * @return Promise<array>
+     * @return Promise<array<Diagnostic>>
      */
     public function analyse(string $filename): Promise
     {
@@ -52,12 +53,7 @@ class PhpstanProcess
                 $filename
             ], $this->cwd);
 
-            $this->logger->info(sprintf(
-                'Phpstan: %s in %s',
-                $process->getCommand(),
-                $process->getWorkingDirectory()
-            ));
-
+            $start = microtime(true);
             $pid = yield $process->start();
             $stdout = yield buffer($process->getStdout());
             $stderr = yield buffer($process->getStderr());
@@ -71,6 +67,13 @@ class PhpstanProcess
                     $stderr
                 ));
             }
+
+            $this->logger->debug(sprintf(
+                'Phpstan completed in %s: %s in %s',
+                number_format(microtime(true) - $start, 4),
+                $process->getCommand(),
+                $process->getWorkingDirectory(),
+            ));
 
             return $this->parser->parse($stdout);
         });
