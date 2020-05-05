@@ -3,6 +3,7 @@
 namespace Phpactor\Extension\LanguageServerPhpstan\Handler;
 
 use Amp\CancellationToken;
+use Amp\CancelledException;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
@@ -28,9 +29,9 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
     private $linter;
 
     /**
-     * @var array<TextDocumentUpdated>
+     * @var ?array{string,string,?int}
      */
-    private $queue = [];
+    private $fileToAnalyse = null;
 
     public function __construct(Linter $linter)
     {
@@ -62,19 +63,27 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
     {
         return \Amp\call(function () use ($transmitter, $token) {
             while (true) {
-                if (null === $textDocument = array_shift($this->queue)) {
-                    yield new Delayed(100);
+                try {
+                    $token->throwIfRequested();
+                } catch (CancelledException $cancelled) {
+                    return;
+                }
+
+                if (null === $textDocument = $this->fileToAnalyse) {
+                    yield new Delayed(10);
                     continue;
                 }
 
-                $diagnostics = yield $this->linter->lint($textDocument->identifier()->uri, $textDocument->updatedText());
+                [$uri, $updatedText, $version] = $this->fileToAnalyse;
 
+                $diagnostics = yield $this->linter->lint($uri, $updatedText);
+                $this->fileToAnalyse = null;
 
                 $transmitter->transmit(new NotificationMessage(
                     'textDocument/publishDiagnostics',
                     [
-                        'uri' => $textDocument->identifier()->uri,
-                        'version' => $textDocument->identifier()->version,
+                        'uri' => $uri,
+                        'version' => $version,
                         'diagnostics' => $diagnostics
                     ]
                 ));
@@ -92,12 +101,12 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
         }
 
         return [
-            [$this, 'lint']
+            [$this, 'lintUpdated']
         ];
     }
 
-    public function lint(TextDocumentUpdated $textDocument): void
+    public function lintUpdated(TextDocumentUpdated $textDocument): void
     {
-        $this->queue[] = $textDocument;
+        $this->fileToAnalyse = [$textDocument->identifier()->uri, $textDocument->updatedText(), $textDocument->identifier()->version];
     }
 }

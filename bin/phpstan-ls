@@ -22,9 +22,13 @@ $container = PhpactorContainer::fromExtensions([
     FilePathResolverExtension::class,
 ], [
     LoggingExtension::PARAM_FORMATTER => 'pretty',
+    LoggingExtension::PARAM_LEVEL => 'debug',
+    LoggingExtension::PARAM_PATH => __DIR__ .'/../phpstan.log',
+    LoggingExtension::PARAM_ENABLED => true,
 ]);
 
 $handler = new StreamHandler(STDERR);
+$handler->setLevel('debug');
 $handler->setFormatter($container->get(PrettyFormatter::class));
 $container->get(LoggingExtension::SERVICE_LOGGER)->pushHandler($handler);
 
