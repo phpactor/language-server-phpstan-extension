@@ -16,7 +16,7 @@ Usage
 If you are using the Phpactor Language Server
 
 ```
-$ phpactor extension:install "phpactor/language-server-phpstan"
+$ phpactor extension:install "phpactor/language-server-phpstan-extension"
 ```
 
 ### Standalone
