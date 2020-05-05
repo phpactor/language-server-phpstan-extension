@@ -2,6 +2,7 @@
 
 namespace Phpactor\Extension\LanguageServerPhpstan\Tests\Model;
 
+use Generator;
 use LanguageServerProtocol\Diagnostic;
 use LanguageServerProtocol\DiagnosticSeverity;
 use LanguageServerProtocol\Position;
@@ -9,6 +10,7 @@ use LanguageServerProtocol\Range;
 use PHPUnit\Framework\TestCase;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
+use Psr\Log\NullLogger;
 
 class PhpstanProcessTest extends IntegrationTestCase
 {
@@ -19,12 +21,15 @@ class PhpstanProcessTest extends IntegrationTestCase
     {
         $this->workspace()->reset();
         $this->workspace()->put('test.php', $source);
-        $linter = new PhpstanProcess();
+        $linter = new PhpstanProcess($this->workspace()->path(), new NullLogger());
         $diagnostics = \Amp\Promise\wait($linter->analyse($this->workspace()->path('test.php')));
         self::assertEquals($expectedDiagnostics, $diagnostics);
     }
 
-    public function provideLint()
+    /**
+     * @return Generator<mixed>
+     */
+    public function provideLint(): Generator
     {
         yield [
             '<?php $foobar = "string";',
@@ -35,8 +40,8 @@ class PhpstanProcessTest extends IntegrationTestCase
             '<?php $foobar = $barfoo;',
             [
                 new Diagnostic('Undefined variable: $barfoo', new Range(
-                    new Position(1, 1),
-                    new Position(1, 1)
+                    new Position(0, 1),
+                    new Position(0, 100)
                 ), null, DiagnosticSeverity::ERROR, 'phpstan'),
             ]
         ];

@@ -72,6 +72,31 @@ class PhpstanHandlerTest extends AsyncTestCase
         $this->tester->serviceManager()->stop('phpstan');
     }
 
+    /**
+     * @return Generator<mixed>
+     */
+    public function testHandleManyFast(): Generator
+    {
+        $updated = new TextDocumentUpdated(new VersionedTextDocumentIdentifier('file://path', 12), 'asd');
+        $this->handler->lintUpdated($updated);
+        $this->handler->lintUpdated($updated);
+        $this->handler->lintUpdated($updated);
+        $this->handler->lintUpdated($updated);
+        $this->handler->lintUpdated($updated);
+
+        yield new Delayed(100);
+
+        $messages = [];
+        while ($message = $this->tester->transmitter()->shift()) {
+            $messages[] = $message;
+        }
+
+        $this->tester->serviceManager()->stop('phpstan');
+
+        self::assertCount(2, $messages);
+
+    }
+
     private function createTestLinter(): TestLinter
     {
         return new TestLinter([

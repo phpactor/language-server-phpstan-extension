@@ -40,6 +40,16 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
      */
     private $deferred;
 
+    /**
+     * @var bool
+     */
+    private $linting;
+
+    /**
+     * @var ?FileToLint
+     */
+    private $next;
+
     public function __construct(Linter $linter, int $pollTime = 100)
     {
         $this->linter = $linter;
@@ -78,10 +88,16 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
                     return;
                 }
 
-                $fileToLint = yield $this->deferred->promise();
+                if ($this->next) {
+                    $fileToLint = $this->next;
+                    $this->next = null;
+                } else {
+                    $fileToLint = yield $this->deferred->promise();
+                }
 
                 // reset deferred
                 $this->deferred = new Deferred();
+                $this->linting = false;
 
                 assert($fileToLint instanceof FileToLint);
                 $diagnostics = yield $this->linter->lint($fileToLint->uri(), $fileToLint->contents());
@@ -114,10 +130,18 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
 
     public function lintUpdated(TextDocumentUpdated $textDocument): void
     {
-        $this->deferred->resolve(new FileToLint(
+        $fileToLint = new FileToLint(
             $textDocument->identifier()->uri,
             $textDocument->updatedText(),
             $textDocument->identifier()->version
-        ));
+        );
+
+        if ($this->linting === true) {
+            $this->next = $fileToLint;
+            return;
+        }
+
+        $this->linting = true;
+        $this->deferred->resolve($fileToLint);
     }
 }
