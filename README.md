@@ -38,7 +38,6 @@ something like (`:CocConfig`):
     "languageserver": {
         "phpstan": {
             "enable": true,
-            "revealOutputChannelOn": "never",
             "command": "/some/path/bin/phpstan-ls",
             "args": ["language-server"],
             "filetypes": ["php"]
