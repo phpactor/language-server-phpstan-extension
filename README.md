@@ -5,7 +5,8 @@ LanguageServerPhpstan
 
 Phpstan Language Server and [Phpactor](https://github.com/phpactor/phpactor) Extension.
 
-Provides language server diagnostics from Phpstan.
+Provides [Language
+Server](https://microsoft.github.io/language-server-protocol/specification) diagnostics from [Phpstan](https://phpstan.org/).
 
 Usage
 -----
