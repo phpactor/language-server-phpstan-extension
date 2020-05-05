@@ -4,9 +4,11 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Handler;
 
 use Amp\CancellationToken;
 use Amp\CancelledException;
+use Amp\Deferred;
 use Amp\Delayed;
 use Amp\Promise;
 use Amp\Success;
+use Phpactor\Extension\LanguageServerPhpstan\Model\FileToLint;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use Phpactor\LanguageServer\Core\Handler\ServiceProvider;
@@ -29,13 +31,20 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
     private $linter;
 
     /**
-     * @var ?array{string,string,?int}
+     * @var int
      */
-    private $fileToAnalyse = null;
+    private $pollTime;
 
-    public function __construct(Linter $linter)
+    /**
+     * @var Deferred<FileToLint>
+     */
+    private $deferred;
+
+    public function __construct(Linter $linter, int $pollTime = 100)
     {
         $this->linter = $linter;
+        $this->pollTime = $pollTime;
+        $this->deferred = new Deferred();
     }
 
     /**
@@ -69,21 +78,19 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
                     return;
                 }
 
-                if (null === $textDocument = $this->fileToAnalyse) {
-                    yield new Delayed(10);
-                    continue;
-                }
+                $fileToLint = yield $this->deferred->promise();
 
-                [$uri, $updatedText, $version] = $this->fileToAnalyse;
+                // reset deferred
+                $this->deferred = new Deferred();
 
-                $diagnostics = yield $this->linter->lint($uri, $updatedText);
-                $this->fileToAnalyse = null;
+                assert($fileToLint instanceof FileToLint);
+                $diagnostics = yield $this->linter->lint($fileToLint->uri(), $fileToLint->contents());
 
                 $transmitter->transmit(new NotificationMessage(
                     'textDocument/publishDiagnostics',
                     [
-                        'uri' => $uri,
-                        'version' => $version,
+                        'uri' => $fileToLint->uri(),
+                        'version' => $fileToLint->version(),
                         'diagnostics' => $diagnostics
                     ]
                 ));
@@ -107,6 +114,10 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
 
     public function lintUpdated(TextDocumentUpdated $textDocument): void
     {
-        $this->fileToAnalyse = [$textDocument->identifier()->uri, $textDocument->updatedText(), $textDocument->identifier()->version];
+        $this->deferred->resolve(new FileToLint(
+            $textDocument->identifier()->uri,
+            $textDocument->updatedText(),
+            $textDocument->identifier()->version
+        ));
     }
 }

@@ -7,6 +7,7 @@ use Phpactor\Container\ContainerBuilder;
 use Phpactor\Container\Extension;
 use Phpactor\Extension\LanguageServerPhpstan\Handler\PhpstanHandler;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
+use Phpactor\Extension\LanguageServerPhpstan\Model\Linter\PhpstanLinter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use Phpactor\Extension\LanguageServer\LanguageServerExtension;
 use Phpactor\Extension\Logger\LoggingExtension;
@@ -28,11 +29,12 @@ class LanguageServerPhpstanExtension implements Extension
         ]);
 
         $container->register(Linter::class, function (Container $container) {
-            return new Linter($container->get(PhpstanProcess::class));
+            return new PhpstanLinter($container->get(PhpstanProcess::class));
         });
 
         $container->register(PhpstanProcess::class, function (Container $container) {
             $root = $container->get(FilePathResolverExtension::SERVICE_FILE_PATH_RESOLVER)->resolve('%project_root%');
+
             return new PhpstanProcess(
                 $root,
                 $container->get(LoggingExtension::SERVICE_LOGGER)

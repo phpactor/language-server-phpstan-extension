@@ -16,27 +16,66 @@ use Phpactor\LanguageServer\Test\HandlerTester;
 
 class PhpstanHandlerTest extends AsyncTestCase
 {
-    public function testHandler(): Generator
+    /**
+     * @var HandlerTester
+     */
+    private $tester;
+
+    /**
+     * @var PhpstanHandler
+     */
+    private $handler;
+
+    protected function setUp(): void
     {
-        $linter = new TestLinter([
-            DiagnosticBuilder::create()->build(),
-        ], 10);
+        parent::setUp();
 
-        $handler = new PhpstanHandler($linter);
-        $tester = new HandlerTester($handler);
+        $this->handler = new PhpstanHandler($this->createTestLinter());
+        $this->tester = new HandlerTester($this->handler);
 
-        $tester->serviceManager()->start('phpstan');
+        $this->tester->serviceManager()->start('phpstan');
+    }
+
+    /**
+     * @return Generator<mixed>
+     */
+    public function testHandleSingle(): Generator
+    {
+        $updated = new TextDocumentUpdated(new VersionedTextDocumentIdentifier('file://path', 12), 'asd');
+        $this->handler->lintUpdated($updated);
+
+        yield new Delayed(10);
+
+        $message = $this->tester->transmitter()->shift();
+
+        self::assertNotNull($message);
+        $this->tester->serviceManager()->stop('phpstan');
+    }
+
+    /**
+     * @return Generator<mixed>
+     */
+    public function testHandleMany(): Generator
+    {
+        $updated = new TextDocumentUpdated(new VersionedTextDocumentIdentifier('file://path', 12), 'asd');
+        $this->handler->lintUpdated($updated);
 
         yield new Delayed(10);
 
         $updated = new TextDocumentUpdated(new VersionedTextDocumentIdentifier('file://path', 12), 'asd');
-        $handler->lintUpdated($updated);
+        $this->handler->lintUpdated($updated);
 
-        yield new Delayed(100);
+        yield new Delayed(10);
 
-        $message = $tester->transmitter()->shift();
-        self::assertNotNull($message);
+        self::assertNotNull($this->tester->transmitter()->shift(), 'has message');
 
-        $tester->serviceManager()->stop('phpstan');
+        $this->tester->serviceManager()->stop('phpstan');
+    }
+
+    private function createTestLinter(): TestLinter
+    {
+        return new TestLinter([
+            DiagnosticBuilder::create()->build(),
+        ], 10);
     }
 }
