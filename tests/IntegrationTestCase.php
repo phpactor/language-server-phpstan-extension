@@ -1,6 +1,6 @@
 <?php
 
-namespace Phpactor\Extension\LanguageServerPhpstan\Tests\Model;
+namespace Phpactor\Extension\LanguageServerPhpstan\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Phpactor\TestUtils\Workspace;

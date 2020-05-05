@@ -9,6 +9,7 @@ use LanguageServerProtocol\Position;
 use LanguageServerProtocol\Range;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use Psr\Log\NullLogger;
+use Phpactor\Extension\LanguageServerPhpstan\Tests\IntegrationTestCase;
 
 class PhpstanProcessTest extends IntegrationTestCase
 {
