@@ -29,7 +29,8 @@ $ composer install
 ```
 
 The process of enabling the server with your client will vary. If you are
-using VIM and CoC it will look something like (`:CocConfig`):
+using VIM and [CoC](https://github.com/neoclide/coc.nvim) it will look
+something like (`:CocConfig`):
 
 ```
 {
