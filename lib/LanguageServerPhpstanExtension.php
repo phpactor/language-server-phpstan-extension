@@ -16,6 +16,8 @@ use Phpactor\MapResolver\Resolver;
 
 class LanguageServerPhpstanExtension implements Extension
 {
+    const PARAM_PHPSTAN_BIN = 'language_server_phpstan.bin';
+
     /**
      * {@inheritDoc}
      */
@@ -33,11 +35,12 @@ class LanguageServerPhpstanExtension implements Extension
         });
 
         $container->register(PhpstanProcess::class, function (Container $container) {
+            $binPath = $container->get(FilePathResolverExtension::SERVICE_FILE_PATH_RESOLVER)->resolve($container->getParameter(self::PARAM_PHPSTAN_BIN));
             $root = $container->get(FilePathResolverExtension::SERVICE_FILE_PATH_RESOLVER)->resolve('%project_root%');
 
             return new PhpstanProcess(
                 $root,
-                $root . '/vendor/bin/phpunit',
+                $binPath,
                 $container->get(LoggingExtension::SERVICE_LOGGER)
             );
         });
@@ -48,5 +51,8 @@ class LanguageServerPhpstanExtension implements Extension
      */
     public function configure(Resolver $schema)
     {
+        $schema->setDefaults([
+            self::PARAM_PHPSTAN_BIN => '%project_root%/vendor/bin/phpstan',
+        ]);
     }
 }
