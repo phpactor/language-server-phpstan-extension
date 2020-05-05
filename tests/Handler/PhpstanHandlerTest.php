@@ -6,9 +6,7 @@ use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
 use LanguageServerProtocol\VersionedTextDocumentIdentifier;
-use PHPUnit\Framework\TestCase;
 use Phpactor\Extension\LanguageServerPhpstan\Handler\PhpstanHandler;
-use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter\TestLinter;
 use Phpactor\Extension\LanguageServerPhpstan\Tests\Util\DiagnosticBuilder;
 use Phpactor\LanguageServer\Event\TextDocumentUpdated;
@@ -94,7 +92,6 @@ class PhpstanHandlerTest extends AsyncTestCase
         $this->tester->serviceManager()->stop('phpstan');
 
         self::assertCount(2, $messages);
-
     }
 
     private function createTestLinter(): TestLinter

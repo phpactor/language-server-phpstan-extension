@@ -5,17 +5,13 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Handler;
 use Amp\CancellationToken;
 use Amp\CancelledException;
 use Amp\Deferred;
-use Amp\Delayed;
 use Amp\Promise;
-use Amp\Success;
 use Phpactor\Extension\LanguageServerPhpstan\Model\FileToLint;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
-use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use Phpactor\LanguageServer\Core\Handler\ServiceProvider;
 use Phpactor\LanguageServer\Core\Rpc\NotificationMessage;
 use Phpactor\LanguageServer\Core\Server\Transmitter\MessageTransmitter;
 use Phpactor\LanguageServer\Event\TextDocumentUpdated;
-use Phpactor\LanguageServer\Handler\System\ServiceHandler;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
 class PhpstanHandler implements ServiceProvider, ListenerProviderInterface

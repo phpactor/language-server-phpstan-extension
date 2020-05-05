@@ -19,8 +19,8 @@ class DiagnosticsParser
 
         foreach ($decoded['files'] ?? [] as $fileDiagnostics) {
             foreach ($fileDiagnostics['messages'] as $message) {
-                $lineNo = $message['line'] - 1;
-                $lineNo = $lineNo > 0 ? $lineNo : 0;
+                $lineNo = (int)$message['line'] - 1;
+                $lineNo = (int)$lineNo > 0 ? $lineNo : 0;
 
                 $diagnostics[] = new Diagnostic(
                     $message['message'],

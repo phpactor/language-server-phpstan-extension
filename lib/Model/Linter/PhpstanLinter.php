@@ -3,8 +3,6 @@
 namespace Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 
 use Amp\Promise;
-use LanguageServerProtocol\Diagnostic;
-use LanguageServerProtocol\VersionedTextDocumentIdentifier;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use function Safe\tempnam;

@@ -7,8 +7,6 @@ use LanguageServerProtocol\Diagnostic;
 use LanguageServerProtocol\DiagnosticSeverity;
 use LanguageServerProtocol\Position;
 use LanguageServerProtocol\Range;
-use PHPUnit\Framework\TestCase;
-use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
 use Psr\Log\NullLogger;
 
