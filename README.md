@@ -50,8 +50,8 @@ something like (`:CocConfig`):
 PHPStan Configuration
 ---------------------
 
-The extension depends on having a `phpstan.neon` which defines your projects
-`level` and analysis `paths` e.g.:
+The extension depends on having a `phpstan.neon` in your project root which
+defines your projects `level` and analysis `paths` e.g.:
 
 ```
 # phpstan.neon
