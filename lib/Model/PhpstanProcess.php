@@ -61,11 +61,13 @@ class PhpstanProcess
             $exitCode = yield $process->join();
 
             if ($exitCode > 1) {
-                throw new PhpstanProcessError(sprintf(
+                $this->logger->error(sprintf(
                     'Phpstan exited with code "%s": %s',
                     $exitCode,
                     $stderr
                 ));
+
+                return [];
             }
 
             $this->logger->debug(sprintf(
@@ -73,6 +75,7 @@ class PhpstanProcess
                 number_format(microtime(true) - $start, 4),
                 $process->getCommand(),
                 $process->getWorkingDirectory(),
+
             ));
 
             return $this->parser->parse($stdout);
