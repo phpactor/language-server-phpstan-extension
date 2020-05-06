@@ -6,7 +6,6 @@ use Amp\Process\Process;
 use Amp\Promise;
 use function Amp\ByteStream\buffer;
 use LanguageServerProtocol\Diagnostic;
-use Phpactor\Extension\LanguageServerPhpstan\Model\Excepteion\PhpstanProcessError;
 use Psr\Log\LoggerInterface;
 
 class PhpstanProcess
@@ -75,7 +74,6 @@ class PhpstanProcess
                 number_format(microtime(true) - $start, 4),
                 $process->getCommand(),
                 $process->getWorkingDirectory(),
-
             ));
 
             return $this->parser->parse($stdout);
