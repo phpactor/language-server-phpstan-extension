@@ -28,7 +28,7 @@ class TestLinter implements Linter
         $this->delay = $delay;
     }
 
-    public function lint(string $url, string $text): Promise
+    public function lint(string $url, ?string $text): Promise
     {
         return \Amp\call(function () {
             yield new Delayed($this->delay);

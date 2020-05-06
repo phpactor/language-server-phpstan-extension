@@ -20,7 +20,7 @@ class PhpstanLinter implements Linter
         $this->process = $process;
     }
 
-    public function lint(string $url, string $text): Promise
+    public function lint(string $url, ?string $text): Promise
     {
         /** @phpstan-ignore-next-line */
         return \Amp\call(function () use ($url, $text) {

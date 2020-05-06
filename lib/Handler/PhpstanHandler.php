@@ -144,16 +144,7 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
             $textDocument->identifier()->version
         );
 
-        // if we are already linting then store whatever comes afterwards in
-        // next, overwriting the redundant update
-        if ($this->linting === true) {
-            $this->next = $fileToLint;
-            return;
-        }
-
-        // resolving the promise will start PHPStan
-        $this->linting = true;
-        $this->deferred->resolve($fileToLint);
+        $this->enqueueLint($fileToLint);
     }
 
     public function lintSaved(TextDocumentSaved $textDocument): void
@@ -162,13 +153,18 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
             $textDocument->identifier()->uri
         );
 
+        $this->enqueueLint($fileToLint);
+    }
+
+    private function enqueueLint(FileToLint $fileToLint): void
+    {
         // if we are already linting then store whatever comes afterwards in
         // next, overwriting the redundant update
         if ($this->linting === true) {
             $this->next = $fileToLint;
             return;
         }
-
+        
         // resolving the promise will start PHPStan
         $this->linting = true;
         $this->deferred->resolve($fileToLint);

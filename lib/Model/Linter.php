@@ -10,5 +10,5 @@ interface Linter
     /**
      * @return Promise<array<Diagnostic>>
      */
-    public function lint(string $url, string $text): Promise;
+    public function lint(string $url, ?string $text): Promise;
 }
