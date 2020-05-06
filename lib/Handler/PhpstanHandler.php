@@ -11,6 +11,7 @@ use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\LanguageServer\Core\Handler\ServiceProvider;
 use Phpactor\LanguageServer\Core\Rpc\NotificationMessage;
 use Phpactor\LanguageServer\Core\Server\Transmitter\MessageTransmitter;
+use Phpactor\LanguageServer\Event\TextDocumentSaved;
 use Phpactor\LanguageServer\Event\TextDocumentUpdated;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
@@ -119,13 +120,20 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
      */
     public function getListenersForEvent(object $event): iterable
     {
-        if (!$event instanceof TextDocumentUpdated) {
-            return [];
+        if ($event instanceof TextDocumentUpdated) {
+            return [
+                [$this, 'lintUpdated']
+            ];
         }
 
-        return [
-            [$this, 'lintUpdated']
-        ];
+        if ($event instanceof TextDocumentSaved) {
+            return [
+                [$this, 'lintSaved']
+            ];
+        }
+
+
+        return [];
     }
 
     public function lintUpdated(TextDocumentUpdated $textDocument): void
@@ -134,6 +142,24 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
             $textDocument->identifier()->uri,
             $textDocument->updatedText(),
             $textDocument->identifier()->version
+        );
+
+        // if we are already linting then store whatever comes afterwards in
+        // next, overwriting the redundant update
+        if ($this->linting === true) {
+            $this->next = $fileToLint;
+            return;
+        }
+
+        // resolving the promise will start PHPStan
+        $this->linting = true;
+        $this->deferred->resolve($fileToLint);
+    }
+
+    public function lintSaved(TextDocumentSaved $textDocument): void
+    {
+        $fileToLint = new FileToLint(
+            $textDocument->identifier()->uri
         );
 
         // if we are already linting then store whatever comes afterwards in

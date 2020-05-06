@@ -5,10 +5,12 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Tests\Handler;
 use Amp\Delayed;
 use Amp\PHPUnit\AsyncTestCase;
 use Generator;
+use LanguageServerProtocol\TextDocumentIdentifier;
 use LanguageServerProtocol\VersionedTextDocumentIdentifier;
 use Phpactor\Extension\LanguageServerPhpstan\Handler\PhpstanHandler;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter\TestLinter;
 use Phpactor\Extension\LanguageServerPhpstan\Tests\Util\DiagnosticBuilder;
+use Phpactor\LanguageServer\Event\TextDocumentSaved;
 use Phpactor\LanguageServer\Event\TextDocumentUpdated;
 use Phpactor\LanguageServer\Test\HandlerTester;
 
@@ -93,6 +95,23 @@ class PhpstanHandlerTest extends AsyncTestCase
 
         self::assertCount(2, $messages);
     }
+
+    /**
+     * @return Generator<mixed>
+     */
+    public function testHandleSaved(): Generator
+    {
+        $saved = new TextDocumentSaved(new TextDocumentIdentifier('file://path'));
+        $this->handler->lintSaved($saved);
+
+        yield new Delayed(10);
+
+        $message = $this->tester->transmitter()->shift();
+
+        self::assertNotNull($message);
+        $this->tester->serviceManager()->stop('phpstan');
+    }
+
 
     private function createTestLinter(): TestLinter
     {

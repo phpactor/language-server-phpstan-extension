@@ -10,7 +10,7 @@ class FileToLint
     private $uri;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $contents;
 
@@ -19,7 +19,7 @@ class FileToLint
      */
     private $version;
 
-    public function __construct(string $uri, string $contents, ?int $version = null)
+    public function __construct(string $uri, ?string $contents = null, ?int $version = null)
     {
         $this->uri = $uri;
         $this->contents = $contents;
@@ -31,7 +31,7 @@ class FileToLint
         return $this->version;
     }
 
-    public function contents(): string
+    public function contents(): ?string
     {
         return $this->contents;
     }
