@@ -4,8 +4,8 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 
 use Amp\Process\Process;
 use Amp\Promise;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 use function Amp\ByteStream\buffer;
-use LanguageServerProtocol\Diagnostic;
 use Psr\Log\LoggerInterface;
 
 class PhpstanProcess
@@ -30,12 +30,21 @@ class PhpstanProcess
      */
     private $phpstanBin;
 
-    public function __construct(string $cwd, string $phpstanBin, LoggerInterface $logger, DiagnosticsParser $parser = null)
-    {
+    /**
+     * @var PhpstanConfig
+     */
+    private $config;
+
+    public function __construct(
+        string $cwd,
+        PhpstanConfig $config,
+        LoggerInterface $logger,
+        DiagnosticsParser $parser = null
+    ) {
         $this->parser = $parser ?: new DiagnosticsParser();
         $this->cwd = $cwd;
         $this->logger = $logger;
-        $this->phpstanBin = $phpstanBin;
+        $this->config = $config;
     }
 
     /**
@@ -44,16 +53,22 @@ class PhpstanProcess
     public function analyse(string $filename): Promise
     {
         return \Amp\call(function () use ($filename) {
-            $process = new Process([
-                $this->phpstanBin,
+            $args = [
+                $this->config->phpstanBin(),
                 'analyse',
                 '--no-progress',
                 '--error-format=json',
                 $filename
-            ], $this->cwd);
+            ];
+
+            if (null !== $this->config->level()) {
+                $args[] = '--level=' . (string)$this->config->level();
+            }
+            $process = new Process($args, $this->cwd);
 
             $start = microtime(true);
             $pid = yield $process->start();
+
             $stdout = yield buffer($process->getStdout());
             $stderr = yield buffer($process->getStderr());
 

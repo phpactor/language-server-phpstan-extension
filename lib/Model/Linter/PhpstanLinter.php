@@ -4,9 +4,9 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 
 use Amp\Promise;
 use Generator;
-use LanguageServerProtocol\Diagnostic;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 use Phpactor\TextDocument\TextDocumentUri;
 use function Safe\tempnam;
 use function Safe\file_put_contents;

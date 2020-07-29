@@ -3,7 +3,7 @@
 namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 
 use Amp\Promise;
-use LanguageServerProtocol\Diagnostic;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 
 interface Linter
 {

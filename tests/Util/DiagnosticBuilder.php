@@ -2,10 +2,10 @@
 
 namespace Phpactor\Extension\LanguageServerPhpstan\Tests\Util;
 
-use LanguageServerProtocol\Diagnostic;
-use LanguageServerProtocol\DiagnosticSeverity;
-use LanguageServerProtocol\Position;
-use LanguageServerProtocol\Range;
+use Phpactor\LanguageServerProtocol\DiagnosticSeverity;
+use Phpactor\LanguageServerProtocol\Position;
+use Phpactor\LanguageServerProtocol\Range;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 
 final class DiagnosticBuilder
 {
@@ -16,9 +16,14 @@ final class DiagnosticBuilder
 
     public function build(): Diagnostic
     {
-        return new Diagnostic('Undefined variable: $barfoo', new Range(
-            new Position(1, 1),
-            new Position(1, 1)
-        ), null, DiagnosticSeverity::ERROR, 'phpstan');
+        return Diagnostic::fromArray([
+            'message' => 'Undefined variable: $barfoo',
+            'range' =>  new Range(
+                new Position(1, 1),
+                new Position(1, 1)
+            ),
+            'severity' => DiagnosticSeverity::ERROR,
+            'source' => 'phpstan'
+        ]);
     }
 }

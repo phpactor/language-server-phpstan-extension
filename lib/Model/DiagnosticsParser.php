@@ -2,10 +2,10 @@
 
 namespace Phpactor\Extension\LanguageServerPhpstan\Model;
 
-use LanguageServerProtocol\Diagnostic;
-use LanguageServerProtocol\DiagnosticSeverity;
-use LanguageServerProtocol\Position;
-use LanguageServerProtocol\Range;
+use Phpactor\LanguageServerProtocol\DiagnosticSeverity;
+use Phpactor\LanguageServerProtocol\Position;
+use Phpactor\LanguageServerProtocol\Range;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 use RuntimeException;
 
 class DiagnosticsParser
@@ -23,13 +23,12 @@ class DiagnosticsParser
                 $lineNo = (int)$message['line'] - 1;
                 $lineNo = (int)$lineNo > 0 ? $lineNo : 0;
 
-                $diagnostics[] = new Diagnostic(
-                    $message['message'],
-                    new Range(new Position($lineNo, 1), new Position($lineNo, 100)),
-                    null,
-                    DiagnosticSeverity::ERROR,
-                    'phpstan'
-                );
+                $diagnostics[] = Diagnostic::fromArray([
+                    'message' => $message['message'],
+                    'range' => new Range(new Position($lineNo, 1), new Position($lineNo, 100)),
+                    'severity' => DiagnosticSeverity::ERROR,
+                    'source' => 'phpstan'
+                ]);
             }
         }
 

@@ -25,6 +25,7 @@ $container = PhpactorContainer::fromExtensions([
     LoggingExtension::PARAM_LEVEL => 'debug',
     LoggingExtension::PARAM_PATH => __DIR__ .'/../phpstan.log',
     LoggingExtension::PARAM_ENABLED => true,
+    LanguageServerExtension::PARAM_ENABLE_WORKPACE => false,
 ]);
 
 $handler = new StreamHandler(STDERR);

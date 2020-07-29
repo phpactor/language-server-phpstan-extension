@@ -3,11 +3,12 @@
 namespace Phpactor\Extension\LanguageServerPhpstan\Tests\Model;
 
 use Generator;
-use LanguageServerProtocol\Diagnostic;
-use LanguageServerProtocol\DiagnosticSeverity;
-use LanguageServerProtocol\Position;
-use LanguageServerProtocol\Range;
+use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanConfig;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
+use Phpactor\LanguageServerProtocol\DiagnosticSeverity;
+use Phpactor\LanguageServerProtocol\Position;
+use Phpactor\LanguageServerProtocol\Range;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 use Psr\Log\NullLogger;
 use Phpactor\Extension\LanguageServerPhpstan\Tests\IntegrationTestCase;
 
@@ -20,7 +21,11 @@ class PhpstanProcessTest extends IntegrationTestCase
     {
         $this->workspace()->reset();
         $this->workspace()->put('test.php', $source);
-        $linter = new PhpstanProcess($this->workspace()->path(), __DIR__ . '/../../vendor/bin/phpstan', new NullLogger());
+        $linter = new PhpstanProcess(
+            $this->workspace()->path(),
+            new PhpstanConfig(__DIR__ . '/../../vendor/bin/phpstan', 7),
+            new NullLogger()
+        );
         $diagnostics = \Amp\Promise\wait($linter->analyse($this->workspace()->path('test.php')));
         self::assertEquals($expectedDiagnostics, $diagnostics);
     }
@@ -38,10 +43,15 @@ class PhpstanProcessTest extends IntegrationTestCase
         yield [
             '<?php $foobar = $barfoo;',
             [
-                new Diagnostic('Undefined variable: $barfoo', new Range(
-                    new Position(0, 1),
-                    new Position(0, 100)
-                ), null, DiagnosticSeverity::ERROR, 'phpstan'),
+                Diagnostic::fromArray([
+                    'range' => new Range(
+                        new Position(0, 1),
+                        new Position(0, 100)
+                    ),
+                    'message' => 'Variable $barfoo might not be defined.',
+                    'severity' => DiagnosticSeverity::ERROR,
+                    'source' => 'phpstan'
+                ])
             ]
         ];
     }

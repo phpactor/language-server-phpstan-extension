@@ -6,16 +6,16 @@ use Amp\CancellationToken;
 use Amp\CancelledException;
 use Amp\Deferred;
 use Amp\Promise;
-use Phpactor\Extension\LanguageServerPhpstan\Model\FileToLint;
-use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
-use Phpactor\LanguageServer\Core\Handler\ServiceProvider;
-use Phpactor\LanguageServer\Core\Rpc\NotificationMessage;
-use Phpactor\LanguageServer\Core\Server\Transmitter\MessageTransmitter;
 use Phpactor\LanguageServer\Event\TextDocumentSaved;
 use Phpactor\LanguageServer\Event\TextDocumentUpdated;
+use Phpactor\LanguageServer\Core\Rpc\NotificationMessage;
+use Phpactor\Extension\LanguageServerPhpstan\Model\FileToLint;
+use Phpactor\LanguageServer\Core\Server\Transmitter\MessageTransmitter;
+use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
+use Phpactor\LanguageServer\Core\Service\ServiceProvider;
 use Psr\EventDispatcher\ListenerProviderInterface;
 
-class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
+class PhpstanService implements ServiceProvider, ListenerProviderInterface
 {
     /**
      * @var MessageTransmitter
@@ -47,11 +47,12 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
      */
     private $next;
 
-    public function __construct(Linter $linter, int $pollTime = 100)
+    public function __construct(MessageTransmitter $transmitter, Linter $linter, int $pollTime = 100)
     {
         $this->linter = $linter;
         $this->pollTime = $pollTime;
         $this->deferred = new Deferred();
+        $this->transmitter = $transmitter;
     }
 
     /**
@@ -75,9 +76,9 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
     /**
      * @return Promise<bool>
      */
-    public function phpstan(MessageTransmitter $transmitter, CancellationToken $token): Promise
+    public function phpstan(CancellationToken $token): Promise
     {
-        return \Amp\call(function () use ($transmitter, $token) {
+        return \Amp\call(function () use ($token) {
             while (true) {
                 try {
                     $token->throwIfRequested();
@@ -103,7 +104,7 @@ class PhpstanHandler implements ServiceProvider, ListenerProviderInterface
                 assert($fileToLint instanceof FileToLint);
                 $diagnostics = yield $this->linter->lint($fileToLint->uri(), $fileToLint->contents());
 
-                $transmitter->transmit(new NotificationMessage(
+                $this->transmitter->transmit(new NotificationMessage(
                     'textDocument/publishDiagnostics',
                     [
                         'uri' => $fileToLint->uri(),

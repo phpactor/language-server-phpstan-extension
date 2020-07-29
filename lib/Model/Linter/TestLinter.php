@@ -4,8 +4,8 @@ namespace Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 
 use Amp\Delayed;
 use Amp\Promise;
-use LanguageServerProtocol\Diagnostic;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
+use Phpactor\LanguageServerProtocol\Diagnostic;
 
 class TestLinter implements Linter
 {
