@@ -14,13 +14,13 @@ final class PhpstanConfig
      */
     private $level;
 
-    public function __construct(string $phpstanBin, ?int $level)
+    public function __construct(string $phpstanBin, ?string $level)
     {
         $this->phpstanBin = $phpstanBin;
         $this->level = $level;
     }
 
-    public function level(): ?int
+    public function level(): ?string
     {
         return $this->level;
     }
