@@ -10,7 +10,7 @@ final class PhpstanConfig
     private $phpstanBin;
 
     /**
-     * @var int|null
+     * @var string|null
      */
     private $level;
 
