@@ -30,7 +30,9 @@ class LanguageServerPhpstanExtension implements Extension
                 $container->get(Linter::class)
             );
         }, [
-            LanguageServerExtension::TAG_DIAGNOSTICS_PROVIDER=> [],
+            LanguageServerExtension::TAG_DIAGNOSTICS_PROVIDER=> [
+                'name' => 'phpstan'
+            ],
         ]);
 
         $container->register(Linter::class, function (Container $container) {
