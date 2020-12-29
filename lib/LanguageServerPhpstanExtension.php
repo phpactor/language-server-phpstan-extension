@@ -5,15 +5,14 @@ namespace Phpactor\Extension\LanguageServerPhpstan;
 use Phpactor\Container\Container;
 use Phpactor\Container\ContainerBuilder;
 use Phpactor\Container\Extension;
-use Phpactor\Extension\LanguageServerPhpstan\Handler\PhpstanService;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\Linter\PhpstanLinter;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanConfig;
 use Phpactor\Extension\LanguageServerPhpstan\Model\PhpstanProcess;
+use Phpactor\Extension\LanguageServerPhpstan\Provider\PhpstanDiagnosticProvider;
 use Phpactor\Extension\LanguageServer\LanguageServerExtension;
 use Phpactor\Extension\Logger\LoggingExtension;
 use Phpactor\FilePathResolverExtension\FilePathResolverExtension;
-use Phpactor\LanguageServer\Core\Server\Transmitter\MessageTransmitter;
 use Phpactor\MapResolver\Resolver;
 
 class LanguageServerPhpstanExtension implements Extension
@@ -26,14 +25,12 @@ class LanguageServerPhpstanExtension implements Extension
      */
     public function load(ContainerBuilder $container)
     {
-        $container->register(PhpstanService::class, function (Container $container) {
-            return new PhpstanService(
-                $container->get(MessageTransmitter::class),
+        $container->register(PhpstanDiagnosticProvider::class, function (Container $container) {
+            return new PhpstanDiagnosticProvider(
                 $container->get(Linter::class)
             );
         }, [
-            LanguageServerExtension::TAG_LISTENER_PROVIDER => [],
-            LanguageServerExtension::TAG_SERVICE_PROVIDER => [],
+            LanguageServerExtension::TAG_DIAGNOSTICS_PROVIDER=> [],
         ]);
 
         $container->register(Linter::class, function (Container $container) {
