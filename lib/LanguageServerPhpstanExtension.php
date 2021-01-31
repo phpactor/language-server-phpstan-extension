@@ -23,7 +23,7 @@ class LanguageServerPhpstanExtension implements Extension
     /**
      * {@inheritDoc}
      */
-    public function load(ContainerBuilder $container)
+    public function load(ContainerBuilder $container): void
     {
         $container->register(PhpstanDiagnosticProvider::class, function (Container $container) {
             return new PhpstanDiagnosticProvider(
@@ -54,7 +54,7 @@ class LanguageServerPhpstanExtension implements Extension
     /**
      * {@inheritDoc}
      */
-    public function configure(Resolver $schema)
+    public function configure(Resolver $schema): void
     {
         $schema->setDefaults([
             self::PARAM_PHPSTAN_BIN => '%project_root%/vendor/bin/phpstan',
