@@ -13,8 +13,8 @@
     ],
     "require": {
         "php": "^7.3 || ^8.0",
-        "phpactor/container": "dev-maestro-php8",
-        "phpactor/language-server-extension": "dev-maestro-php8",
+        "phpactor/container": "^1.3.4",
+        "phpactor/language-server-extension": "^0.5.0",
         "amphp/process": "^1.1",
         "thecodingmachine/safe": "^1.1"
     },
@@ -22,7 +22,7 @@
         "phpstan/phpstan": "~0.12.0",
         "phpunit/phpunit": "^9.1",
         "friendsofphp/php-cs-fixer": "^2.17",
-        "phpactor/test-utils": "^1.1",
+        "phpactor/test-utils": "^1.1.3",
         "amphp/phpunit-util": "^1.4"
     },
     "autoload": {
