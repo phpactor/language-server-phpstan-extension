@@ -3,15 +3,14 @@
     "description": "Standalone Language Server and Phpactor Extension",
     "license": "MIT",
     "type": "phpactor-extension",
-    "minimum-stability":"dev",
-    "prefer-stable":true,
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Daniel Leech",
             "email": "daniel@dantleech.com"
         }
     ],
-
     "require": {
         "php": "^7.3",
         "phpactor/container": "^1.0",
@@ -22,7 +21,7 @@
     "require-dev": {
         "phpstan/phpstan": "~0.12.0",
         "phpunit/phpunit": "^9.1",
-        "friendsofphp/php-cs-fixer": "^2.16",
+        "friendsofphp/php-cs-fixer": "^2.17",
         "phpactor/test-utils": "^1.1",
         "amphp/phpunit-util": "^1.4"
     },
@@ -39,7 +38,7 @@
     "extra": {
         "phpactor.extension_class": "Phpactor\\Extension\\LanguageServerPhpstan\\LanguageServerPhpstanExtension",
         "branch-alias": {
-            "dev-master": "0.1.x-dev"
+            "dev-master": "0.2.x-dev"
         }
     },
     "scripts": {
