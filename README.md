@@ -1,7 +1,7 @@
 LanguageServerPhpstan
 =====================
 
-[![Build Status](https://travis-ci.org/phpactor/language-server-phpstan-extension.svg?branch=master)](https://travis-ci.org/phpactor/language-server-phpstan-extension)
+![CI](https://github.com/phpactor/language-server-phpstan-extension/workflows/CI/badge.svg)
 
 Phpstan Language Server and [Phpactor](https://github.com/phpactor/phpactor) Extension.
 
