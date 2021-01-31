@@ -25,7 +25,6 @@ class PhpstanLinter implements Linter
 
     public function lint(string $url, ?string $text): Promise
     {
-        /** @phpstan-ignore-next-line */
         return \Amp\call(function () use ($url, $text) {
             $diagnostics = yield from $this->doLint($url, $text);
 
