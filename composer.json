@@ -20,7 +20,7 @@
         "thecodingmachine/safe": "^1.1"
     },
     "require-dev": {
-        "phpstan/phpstan": "^0.12.19",
+        "phpstan/phpstan": "~0.12.0",
         "phpunit/phpunit": "^9.1",
         "friendsofphp/php-cs-fixer": "^2.16",
         "phpactor/test-utils": "^1.1",
