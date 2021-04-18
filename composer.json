@@ -14,7 +14,7 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "phpactor/container": "^2.0.0",
-        "phpactor/language-server-extension": "^0.5.0",
+        "phpactor/language-server-extension": "^0.6.0",
         "amphp/process": "^1.1",
         "thecodingmachine/safe": "^1.1"
     },
