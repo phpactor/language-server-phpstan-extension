@@ -17,21 +17,30 @@ class DiagnosticsParser
     {
         $decoded = $this->decodeJson($jsonString);
         $diagnostics = [];
-
-        foreach ($decoded['files'] ?? [] as $fileDiagnostics) {
+         
+        foreach ($decoded['files'] ?? [] as $uri => $fileDiagnostics) {
+            $lines = file($uri);
+            if ($lines === false) {
+                $lines = [];
+            }
+                 
             foreach ($fileDiagnostics['messages'] as $message) {
                 $lineNo = (int)$message['line'] - 1;
                 $lineNo = (int)$lineNo > 0 ? $lineNo : 0;
-
+                $line = $lines[$lineNo] ?? "";
+                 
+                $matches = [];
+                $offset = (\preg_match("/^\\s+/", $line, $matches) === 1) ? mb_strlen($matches[0]) : 0;
+                 
                 $diagnostics[] = Diagnostic::fromArray([
-                    'message' => $message['message'],
-                    'range' => new Range(new Position($lineNo, 1), new Position($lineNo, 100)),
-                    'severity' => DiagnosticSeverity::ERROR,
-                    'source' => 'phpstan'
-                ]);
+                     'message' => $message['message'],
+                     'range' => new Range(new Position($lineNo, $offset), new Position($lineNo, mb_strlen($line))),
+                     'severity' => DiagnosticSeverity::ERROR,
+                     'source' => 'phpstan'
+                 ]);
             }
         }
-
+ 
         return $diagnostics;
     }
 
