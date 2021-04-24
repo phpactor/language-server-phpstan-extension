@@ -20,19 +20,17 @@ class DiagnosticsParser
         $diagnostics = [];
 
         foreach ($decoded['files'] ?? [] as $uri => $fileDiagnostics) {
-            $text = \file_get_contents($uri);
+            if (false === $text = @file_get_contents($uri)) {
+                continue;
+            }
             
             foreach ($fileDiagnostics['messages'] as $message) {
                 $lineNo = (int)$message['line'] - 1;
                 $lineNo = (int)$lineNo > 0 ? $lineNo : 0;
                 
-                $start = 0;
-                $end = 100;
-                if($text !== false) {
-                    $range = (new LineColRangeForLine())->rangeFromLine($text, $lineNo + 1);
-                    $start = $range->start()->col() - 1;
-                    $end = $range->end()->col();
-                }
+                $range = (new LineColRangeForLine())->rangeFromLine($text, $lineNo + 1);
+                $start = $range->start()->col() - 1;
+                $end = $range->end()->col();
                  
                 $diagnostics[] = Diagnostic::fromArray([
                      'message' => $message['message'],
