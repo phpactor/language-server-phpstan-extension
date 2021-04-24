@@ -14,7 +14,8 @@
     "require": {
         "php": "^7.3 || ^8.0",
         "phpactor/container": "^2.0.0",
-        "phpactor/language-server-extension": "^0.6.0",
+        "phpactor/language-server-extension": "^0.6.1",
+        "phpactor/text-document": "^1.2.4",
         "amphp/process": "^1.1",
         "thecodingmachine/safe": "^1.1"
     },
@@ -23,7 +24,8 @@
         "phpunit/phpunit": "^9.1",
         "friendsofphp/php-cs-fixer": "^2.17",
         "phpactor/test-utils": "^1.1.3",
-        "amphp/phpunit-util": "^1.4"
+        "amphp/phpunit-util": "^1.4",
+        "symfony/var-dumper": "^5.2"
     },
     "autoload": {
         "psr-4": {
