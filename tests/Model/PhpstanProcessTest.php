@@ -45,8 +45,8 @@ class PhpstanProcessTest extends IntegrationTestCase
             [
                 Diagnostic::fromArray([
                     'range' => new Range(
-                        new Position(0, 1),
-                        new Position(0, 100)
+                        new Position(0, 0),
+                        new Position(0, 24)
                     ),
                     'message' => 'Variable $barfoo might not be defined.',
                     'severity' => DiagnosticSeverity::ERROR,

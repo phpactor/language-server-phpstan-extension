@@ -19,7 +19,7 @@ class DiagnosticsParserTest extends TestCase
     public function provideParse()
     {
         yield [
-            '{"totals":{"errors":0,"file_errors":1},"files":{"/home/daniel/www/phpactor/language-server-phpstan/test.php":{"errors":1,"messages":[{"message":"Undefined variable: $bar","line":3,"ignorable":true}]}},"errors":[]}',
+            '{"totals":{"errors":0,"file_errors":1},"files":{"'.__FILE__.'":{"errors":1,"messages":[{"message":"Undefined variable: $bar","line":3,"ignorable":true}]}},"errors":[]}',
             1
         ];
     }
