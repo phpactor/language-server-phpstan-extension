@@ -6,6 +6,7 @@ use Phpactor\LanguageServerProtocol\DiagnosticSeverity;
 use Phpactor\LanguageServerProtocol\Position;
 use Phpactor\LanguageServerProtocol\Range;
 use Phpactor\LanguageServerProtocol\Diagnostic;
+use Phpactor\TextDocument\Util\LineColRangeForLine;
 use RuntimeException;
 
 class DiagnosticsParser
@@ -17,24 +18,25 @@ class DiagnosticsParser
     {
         $decoded = $this->decodeJson($jsonString);
         $diagnostics = [];
-         
+
         foreach ($decoded['files'] ?? [] as $uri => $fileDiagnostics) {
-            $lines = file($uri);
-            if ($lines === false) {
-                $lines = [];
-            }
-                 
+            $text = \file_get_contents($uri);
+            
             foreach ($fileDiagnostics['messages'] as $message) {
                 $lineNo = (int)$message['line'] - 1;
                 $lineNo = (int)$lineNo > 0 ? $lineNo : 0;
-                $line = $lines[$lineNo] ?? "";
-                 
-                $matches = [];
-                $offset = (\preg_match("/^\\s+/", $line, $matches) === 1) ? mb_strlen($matches[0]) : 0;
+                
+                $start = 0;
+                $end = 100;
+                if($text !== false) {
+                    $range = (new LineColRangeForLine())->rangeFromLine($text, $lineNo + 1);
+                    $start = $range->start()->col() - 1;
+                    $end = $range->end()->col();
+                }
                  
                 $diagnostics[] = Diagnostic::fromArray([
                      'message' => $message['message'],
-                     'range' => new Range(new Position($lineNo, $offset), new Position($lineNo, mb_strlen($line))),
+                     'range' => new Range(new Position($lineNo, $start), new Position($lineNo, $end)),
                      'severity' => DiagnosticSeverity::ERROR,
                      'source' => 'phpstan'
                  ]);
